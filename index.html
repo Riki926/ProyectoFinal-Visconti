@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Asistencia</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 400px; margin: auto; }
+        input, select, button { margin: 5px 0; display: block; width: 100%; }
+        #listaEstudiantes { display: none; }
+        .estudiante-item { display: flex; align-items: center; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Asistencia</h1>
+
+        <!-- Selección de materia -->
+        <label for="materiaSeleccionada">Seleccionar Materia:</label>
+        <select id="materiaSeleccionada" onchange="cambiarMateria(); mostrarLista();">
+            <option value="Matemáticas">Matemáticas</option>
+            <option value="Lengua">Lengua</option>
+            <option value="Historia">Historia</option>
+            <option value="Ciencias">Ciencias</option>
+            <option value="Inglés">Inglés</option>
+        </select>
+
+        <!-- Campo para seleccionar la fecha de asistencia -->
+        <label for="fechaAsistencia">Fecha:</label>
+        <input type="date" id="fechaAsistencia" onchange="mostrarLista()">
+
+        <!-- Campo de búsqueda de estudiantes -->
+        <input type="text" id="busqueda" placeholder="Buscar estudiante..." onkeyup="filtrarEstudiantes()">
+
+        <!-- Botón para mostrar u ocultar la lista de estudiantes -->
+        <button onclick="toggleLista()">Mostrar/Ocultar Estudiantes</button>
+
+        <!-- Botón para marcar todos como presentes -->
+        <button onclick="marcarTodosPresentes()">Marcar Todos Presentes</button>
+
+        <!-- Lista de estudiantes cargada dinámicamente -->
+        <div id="listaEstudiantes"></div>
+    </div>
+    
+    <!-- Archivo JavaScript -->
+    <script src="./simulador/simulador-asistencia.js"></script>
+</body>
+</html>
