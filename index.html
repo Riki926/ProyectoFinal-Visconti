@@ -1,48 +1,126 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Asistencia</title>
-    <link rel="stylesheet" href="asistencia.css">
-    <script defer src="./simulador-asistencia.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
-        input, select, button { margin: 5px 0; display: block; width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background-color: #28a745; color: white; cursor: pointer; transition: 0.3s; }
-        button:hover { background-color: #218838; }
-        #listaEstudiantes { display: none; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #007bff; color: white; }
-        .presente { background-color: #c3e6cb; }
-        .eliminar { background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Asistencia</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+ 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <link rel="stylesheet" href="./simulador/asistencia.css" />
+  
+ 
 </head>
 <body>
-    <div class="container">
-        <h1>Registro de Asistencia</h1>
+  <div class="container">
+    <h1>Registro de Asistencia</h1>
+<!-- Botón para abrir el formulario -->
+<button id="btnAbrirFormularioMateria" style="margin-bottom:10px;">➕ Agregar Materia</button>
 
-        <label for="materiaSeleccionada">Seleccionar Materia:</label>
-        <select id="materiaSeleccionada"></select>
+<input
+  type="text"
+  id="buscadorGeneral"
+  placeholder="🔎 Buscar docente o materia..."
+  style="width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 4px;"
+/>
 
-        <label for="fechaAsistencia">Fecha:</label>
-        <input type="date" id="fechaAsistencia">
 
-        <button id="btnToggleLista">Mostrar Estudiantes</button>
+<!-- Formulario oculto por defecto -->
+<div id="formularioMateria" style="display:none; margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background: #f9f9f9;">
+  <label for="nombreMateria">Nombre de la materia:</label>
+  <input type="text" id="nombreMateria" placeholder="Ej: Matemáticas">
 
-        <label for="nuevoEstudiante">Nombre del Estudiante:</label>
-        <input type="text" id="nuevoEstudiante" placeholder="Nombre del estudiante">
-        
-        <label for="dniEstudiante">DNI del Estudiante:</label>
-        <input type="text" id="dniEstudiante" placeholder="DNI del estudiante">
 
-        <button id="btnAgregarEstudiante">Agregar Estudiante</button>
+  <label for="docenteMateria">Nombre del docente:</label>
+  <input type="text" id="docenteMateria" placeholder="Ej: Profe Juan">
 
-        <div id="listaEstudiantes"></div>
-        <div id="historialAsistencia" class="historial-popup"></div>
+  <p>Días y cantidad de módulos:</p>
+  <div id="diasModulos">
+    <label>Lunes: <input type="number" min="0" max="8" id="modulosLunes" value="0"></label><br>
+    <label>Martes: <input type="number" min="0" max="8" id="modulosMartes" value="0"></label><br>
+    <label>Miércoles: <input type="number" min="0" max="8" id="modulosMiercoles" value="0"></label><br>
+    <label>Jueves: <input type="number" min="0" max="8" id="modulosJueves" value="0"></label><br>
+    <label>Viernes: <input type="number" min="0" max="8" id="modulosViernes" value="0"></label>
+  </div>
 
-    </div>
+  <button id="btnGuardarMateria" style="margin-top:10px;">✅ Guardar Materia</button>
+</div>
+
+<label for="materiaSeleccionada">Seleccionar Materia:</label>
+
+<div style="display: flex; gap: 10px; align-items: center;">
+  <select id="materiaSeleccionada" style="flex: 1;"></select>
+  <button id="btnEditarMateria" style="background-color: orange; color: white; padding: 5px 10px; border: none;">✏️</button>
+  <button id="btnEliminarMateria" style="background-color: red; color: white; padding: 5px 10px; border: none;">🗑️</button>
+</div>
+
+
+    <label for="fechaAsistencia">Fecha:</label>
+    <input type="date" id="fechaAsistencia" />
+
+    <button id="btnVerAsistenciaDocente" style="margin: 10px 0; background-color: teal; color: white; padding: 8px 12px; border: none; border-radius: 4px;">
+        📋 Ver asistencia del profe
+      </button>
+      <button id="btnVerHistorialDocente" style="margin: 10px 0; background-color: #444; color: white; padding: 8px 12px; border: none; border-radius: 4px;">
+        📖 Ver historial del profe
+      </button>
+
+      <button id="btnExportarHistorialDocente" style="margin-top: 10px; background-color: #4caf50; color: white; padding: 8px 12px; border: none; border-radius: 4px;">
+        📥 Exportar historial a Excel
+      </button>
+      
+      
+      <div id="historialDocenteContenedor" style="margin-top: 10px; display: none; background: #f5f5f5; padding: 10px; border-radius: 5px;"></div>
+      
+
+      
+      <!-- Contenedor para mostrar los botones presente / ausente -->
+      <div id="asistenciaDocenteContenedor" style="margin-top: 10px;"></div>
+    
+      
+
+    
+
+    <button id="btnToggleLista">Mostrar lista de  Estudiantes</button>
+    <input type="text" id="buscadorEstudiante" placeholder="Buscar estudiante por nombre o DNI"
+    style="width: 100%; margin: 10px 0; padding: 8px; border-radius: 4px; border: 1px solid #ccc;"
+  />
+
+ 
+  
+  <button id="btnLimpiarBusquedaEstudiante" style="margin-bottom: 10px; padding: 6px 10px; border: none; border-radius: 4px; background-color: #777; color: white; cursor: pointer;">
+    🔄 Limpiar búsqueda
+  </button>
+    
+
+
+
+    <label for="nuevoEstudiante">Nombre del Estudiante:</label>
+    <input type="text" id="nuevoEstudiante" placeholder="Nombre del estudiante"/>
+
+    <label for="dniEstudiante">DNI del Estudiante:</label>
+    <input type="text" id="dniEstudiante" placeholder="DNI del estudiante"/>
+
+    <button id="btnAgregarEstudiante">Agregar Estudiante</button>
+
+    <button id="btnExportarExcelEstudiantes" style="margin: 10px 0; background-color: #2f8f2f; color: white; padding: 8px 12px; border: none; border-radius: 4px;">
+        📤 Exportar asistencia a Excel
+      </button>
+
+    <button id="btnCargarExcel" style="margin-top: 10px; background-color: purple; color: white; padding: 5px 10px; border: none; border-radius: 4px;">
+        📥 Cargar lista desde Excel
+      </button>
+      <input type="file" id="archivoExcel" accept=".xlsx, .xls" style="display: none;" />
+      <input type="file" id="archivoExcel" accept=".xlsx, .xls" style="display: none;" />
+      
+
+
+
+    <div id="listaEstudiantes"></div>
+    <div id="historialAsistencia" class="historial-popup"></div>
+  </div>
+  <script src="./simulador/simulador-asistencia.js"></script>
 </body>
 </html>
