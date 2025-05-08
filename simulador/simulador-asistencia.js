@@ -481,6 +481,7 @@ if (dia) {
     const lista = document.getElementById("listaEstudiantes");
     const materia = document.getElementById("materiaSeleccionada").value;
     const fecha = document.getElementById("fechaAsistencia").value;
+    const esMovil = window.innerWidth <= 768;
   
     if (!asistencia[materia]) return;
   
@@ -520,9 +521,12 @@ if (dia) {
   
       // Celda asistencia con checkboxes
       const asistenciaTd = document.createElement("td");
+      asistenciaTd.style.minWidth = esMovil ? "120px" : "auto";
+      
       for (let i = 0; i < maxModulos; i++) {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
+        checkbox.className = "checkbox-asistencia";
         checkbox.dataset.dni = est.dni;
         checkbox.dataset.modulo = i;
         checkbox.dataset.fecha = fecha;
@@ -544,11 +548,13 @@ if (dia) {
       // Nombre
       const nombreTd = document.createElement("td");
       nombreTd.textContent = est.nombre;
+      nombreTd.style.minWidth = esMovil ? "120px" : "auto";
       row.appendChild(nombreTd);
   
       // DNI
       const dniTd = document.createElement("td");
       dniTd.textContent = est.dni;
+      dniTd.style.minWidth = esMovil ? "100px" : "auto";
       row.appendChild(dniTd);
   
       // Porcentaje
@@ -561,6 +567,7 @@ if (dia) {
       const historialBtn = document.createElement("button");
       historialBtn.textContent = "📅";
       historialBtn.className = "historial-btn";
+      historialBtn.style.padding = esMovil ? "8px" : "5px 10px";
       historialBtn.addEventListener("click", () => mostrarHistorial(est.dni));
       historialTd.appendChild(historialBtn);
       row.appendChild(historialTd);
@@ -570,6 +577,7 @@ if (dia) {
       const eliminarBtn = document.createElement("button");
       eliminarBtn.textContent = "X";
       eliminarBtn.className = "eliminar";
+      eliminarBtn.style.padding = esMovil ? "8px" : "5px 10px";
       eliminarBtn.addEventListener("click", () => eliminarEstudiante(est.dni));
       eliminarTd.appendChild(eliminarBtn);
       row.appendChild(eliminarTd);
@@ -579,6 +587,12 @@ if (dia) {
   
     lista.appendChild(table);
   }
+
+  // Agregar evento para detectar cambios en el tamaño de la ventana
+  window.addEventListener('resize', () => {
+    mostrarLista();
+  });
+
 function registrarAsistenciaCheckbox(dni, fecha, totalModulos) {
   const materiaSeleccionada = document.getElementById("materiaSeleccionada").value;
 
